@@ -24,41 +24,29 @@ function start() {
 
 function showAllProducts() {
 
-    connection.query(
-        'SELECT * FROM products',
-        function (error,result) {
-            if (error) {
-                console.log(error);
-            } else {
-                //console.log(result);
-                let dataArr = result;
-                for (let i=0; i < dataArr.length; i++) {
-                    console.log("ID: " + dataArr[i].item_id + "; Name: " + dataArr[i].product_name + "; Department: " + dataArr[i].department_name + "; Price: " + dataArr[i].price);
-                }
-
-            }
+    connection.query('SELECT * FROM products',function (err,results) {
+            if (err) throw err;
             
-            connection.end();
-        }
-    )
+            // once you have the items, prompt the user for which they'd like to bid on
+            inquirer
+            .prompt([
+            {
+                name: "choice",
+                type: "rawlist",
+                choices: function() {
+                var choiceArray = [];
+                for (var i = 0; i < results.length; i++) {
+                    choiceArray.push(results[i].item_name);
+                }
+                return choiceArray;
+                },
+                message: "What product ID would you like to buy?"
+            }])
+            .then(function(answer) {
+                console.log(answer);
+            });
 
-}
-
-function whatItem() {
-
-    inquirer.prompt([
-        {
-            type: "input",
-            message: "Type the item ID of the product would you like to buy?\r\n",
-            name: "item"
-        }
-    ]).then(function(whatItemResponse) {
-
-        // ask them how many they want to buy
-        howManyItems(whatItemResponse.item);
-
-    })
-
+        });
 }
 
 function howManyItems(item_id) {
